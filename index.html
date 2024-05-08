@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login and Add Data to Firebase</title>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+      import {
+        getAuth,
+        signInAnonymously,
+      } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+      import {
+        getDatabase,
+        ref,
+        push,
+        set,
+        update,
+      } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDI2N6ArJ1fwiaVCME3ZJA91FhvK4GhkvQ",
+        authDomain: "bustrack-5da4f.firebaseapp.com",
+        databaseURL:
+          "https://bustrack-5da4f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "bustrack-5da4f",
+        storageBucket: "bustrack-5da4f.appspot.com",
+        messagingSenderId: "452746855880",
+        appId: "1:452746855880:web:c1f619f6991dee980dacfd",
+        measurementId: "G-59LPQ1LWKK",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const database = getDatabase(app);
+
+      // Automatically log in users anonymously when page loads
+      window.onload = () => {
+        signInAnonymously(auth)
+          .then(() => {
+            console.log("Logged in as an anonymous user.");
+            document.getElementById("status").textContent =
+              "Logged in anonymously";
+            document.getElementById("addDataBtn").disabled = false;
+          })
+          .catch((error) => {
+            console.error("Anonymous authentication failed:", error);
+            document.getElementById("status").textContent =
+              "Login failed: " + error.message;
+          });
+      };
+
+      // Function to add data to Firebase
+      function addData() {
+        if (auth.currentUser) {
+          const newData = {
+            6: "2024-05-08T18:22:21.305496",
+          };
+          const dataRef = ref(
+            database,
+            "permanent/s5ue4XvVIiWz5vdxFdkpYHtPfy93/attendance/2024/"
+          );
+          update(dataRef, newData)
+            .then(() => {
+              console.log("Data updated successfully.");
+              document.getElementById("status").textContent =
+                "Data updated successfully";
+            })
+            .catch((error) => {
+              console.error("Data could not be updated: " + error);
+              document.getElementById("status").textContent =
+                "Error updating data: " + error.message;
+            });
+        } else {
+          console.log("User must be logged in to add data.");
+          document.getElementById("status").textContent =
+            "Please log in to add data";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        const addButton = document.getElementById("addDataBtn");
+        addButton.addEventListener("click", addData);
+      });
+    </script>
+  </head>
+  <body>
+    <button id="addDataBtn" onclick="addData()" disabled>Add Data</button>
+    <p id="status">Waiting for authentication...</p>
+  </body>
+</html>
